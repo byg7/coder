@@ -9,6 +9,7 @@ if(isset($_POST['hr_ajax'])){
 if(!$hr_ajax){
   startblock('content');
 ?>
+<script src="/js/textile.min.js"></script>
 <script src="/plugin/tinymce/tinymce.min.js"></script>
 <script Language="JavaScript">
 function XmlHttp() {
@@ -263,6 +264,7 @@ function hr_parser(text,flag){
       keylog+=key+"->";
     }
 hr_log("parser keylog: "+keylog);
+hr_log("textile: "+textile.parse( '|_.Кол1|_.Кол2|\n\np. Проверка\n' ));
     var rtext=decoded.substr(1,decoded.length).split("\n");
     var h=0;
     if(flag=='*'){
