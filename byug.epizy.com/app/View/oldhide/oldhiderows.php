@@ -218,19 +218,7 @@ function hr_pkey() {
 }
 function hr_pkey2() {
   var p=document.getElementById('hr_passwd').value;
-/*  if (document.getElementById('hr_pas2check').checked) {
-    var p2=document.getElementById('hr_pas2').value;
-    var p3=document.getElementById('hr_pas3').value;
-    if (p2.length>0) {
-      if (p2==p3) {
-        p=p2;
-      }
-    }
-    if (p!=p2) {
-      alert('Used old passwd');
-    }
-  }
-*/  return p;
+  return p;
 }
 function hr_cell(text, w) {
   var atext=text.split("/");
@@ -264,11 +252,12 @@ function hr_parser(text,flag){
       keylog+=key+"->";
     }
 hr_log("parser keylog: "+keylog);
-hr_log("textile: "+textile.parse( '|_.Кол1|_.Кол2|\n\np. Проверка\n' ));
     var rtext=decoded.substr(1,decoded.length).split("\n");
     var h=0;
     if(flag=='*'){
       return rtext.join(''); //<br/>
+    }else if(flag=='#'){
+      return textile.parse(rtext.join('\n'));
     }else{
       var r="<div class='hrtable'><table class='hrtable'>";
       var wtext=[];
@@ -340,6 +329,9 @@ hr_log("select keylog: "+keylog);
             if(stext[j].substr(0,1)=='*'){
               stextj=stext[j].substr(1,stext[j].length);
               sclassj='*';
+            }else if(stext[j].substr(0,1)=='#'){
+              stextj=stext[j].substr(1,stext[j].length);
+              sclassj='#';
             }else{
               stextj=stext[j];
               sclassj='';
@@ -348,6 +340,9 @@ hr_log("select keylog: "+keylog);
             if(stext[i].substr(0,1)=='*'){
               stexti=stext[i].substr(1,stext[i].length);
               sclassi='*';
+            }else if(stext[i].substr(0,1)=='#'){
+              stexti=stext[i].substr(1,stext[i].length);
+              sclassi='#';
             }else{
               stexti=stext[i];
               sclassi='';
@@ -370,7 +365,7 @@ hr_log("select keylog: "+keylog);
         }
       }
     }
-  } else {
+  }else{
     r=r+"<option value='2'>New category</option>\n";
   }  
   r=r+"</select>";
@@ -416,7 +411,10 @@ function hr_edit() {
         }
         value=value.substr(1, value.length);
       }
-      value=value.split('|').join(' | ');
+      if((val_id_name.substr(0,1)!='*')
+      &&(val_id_name.substr(0,1)!='#')){
+        value=value.split('|').join(' | ');
+      }
       r=r+val_id_name+" введите новое название <input type='text' id='hr_edit_cat' value='"+
         val_id_name+"'/><a class='btn' href='#' onclick='tinyMCE.execCommand("+
         '"mceToggleEditor",false,"hr_edit_val"'+");return false;' title='Включить редактор'>"+
@@ -425,12 +423,13 @@ function hr_edit() {
     document.getElementById("hr_form_work").innerHTML=r;
     if (val_id_name.substr(0,1)=='*') {
       tinyMCE.init({
-  selector : "textarea",
-  plugins: [
-    'advlist autolink lists link image charmap print preview anchor textcolor',
-    'searchreplace visualblocks code fullscreen',
-    'insertdatetime media table contextmenu paste code'
-  ]});
+        selector : "textarea",
+        plugins: [
+          'advlist autolink lists link image charmap print preview anchor textcolor',
+          'searchreplace visualblocks code fullscreen',
+          'insertdatetime media table contextmenu paste code'
+        ]
+      });
     }
   } else {
     var send="";
@@ -461,11 +460,14 @@ hr_log("select keys="+keylog);
     send+="hr_set="+val_id+"&";
 // теперь сами данные
     select="a"+document.getElementById('hr_edit_val').value;
-    select=select.split("  ").join("|");
-    select=select.split("  |").join("|");
-    select=select.split("|  ").join("|");
-    select=select.split(" |").join("|");
-    select=select.split("| ").join("|");
+    if((aselect[val_id-2].substr(0,1)!='#')
+    &&(aselect[val_id-2].substr(0,1)!='*')){
+      select=select.split("	").join("|");
+      select=select.split("  |").join("|");
+      select=select.split("|  ").join("|");
+      select=select.split(" |").join("|");
+      select=select.split("| ").join("|");
+    }
     var keys=(Math.random()*1000).toFixed(0)%8+4;
     var keylog=keys+"->";
     for (var i=0; i<keys;i++) {
